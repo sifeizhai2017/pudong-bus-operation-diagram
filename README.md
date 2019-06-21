@@ -1,7 +1,6 @@
 # shanghai-bus-operation-diagram
-#### 上海公交模拟图魔改项目
-<br/>
-#### 示范站点：https://shbus.eu.org/bus/pudong/
+#### 上海公交模拟图魔改项目 
+示范站点：https://shbus.eu.org/bus/pudong/
 <br/>
 请注意本项目遵守GNU General Public License v3.0协议
 <br/>

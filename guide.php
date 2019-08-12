@@ -638,7 +638,7 @@
                     return;
                 }
                 $("#mask,#loader").show();
-                var urlx = "index.htm?roadline=" + escape(line);
+                var urlx = "index.php?roadline=" + escape(line);
                 location.href = urlx;
 
             });

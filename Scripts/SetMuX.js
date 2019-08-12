@@ -1,3 +1,715 @@
-var RoadLine="926";var getfirst="";var getlast="";var vn0="";var vn1="";var revid="";$(document).ready(function(){var b=window.location.search;if(b!=""){var a=b.replace("?","").split("&");$(a).each(function(d){var c=a[d].split("=");if(c[0]=="roadline"){RoadLine=c[1]}else{if(c[0]=="user"){if(c[1]!="test"){window.location="guide.htm"}}}if(c[0]=="vid"){revid=c[1]}});if(loadMould()){$("#divNull").hide();Move();setTimeout(TogetAll,1000);setInterval(Move,1000)}else{$("#divNull").show();$("#showModule").hide();$("#loading").fadeOut()}}else{window.location="guide.htm"}});var he1=0;var he2=0;var levelPosition1=[];var levelPosition2=[];function loadMould(){var e=true;var d="";var c="";var a=0;var f=0;var b="ajax/controller.php?Method=station&roadline="+RoadLine;$.ajax({url:b,type:"GET",dataType:"text",async:false,timeout:5000,error:function(){e=false},success:function(m){if(m==null||m==""||m==undefined){$("#RefreshM").show();$("#showModule").hide();$("#loading").fadeOut();e=false}var m=$.parseJSON(m);var h=m.data;if(h.length>0){$("#RoadLine").html(h[0].RoadLine);for(var n=0;n<h.length;n++){if(h[n].Upstream!=""&&h[n].Upstream!=null){if(f==0){getfirst=h[n].ToDirection}f++}else{if(a==0){getlast=h[n].ToDirection}a++}}for(n=0;n<h.length;n++){if(h[n].Upstream!==""&&h[n].Upstream!==null){var l=0;var q=n;var p=h.length-q;if(p>q){l=p}else{l=q}break}}if(l>28){l=(l-28)*35+890}else{if(l<14&&l>2){l=890-(14-l)*10.2*l}else{if(l==2){l=200}else{l=890}}}var o=document.getElementById("stationall");o.style.height=l+"px";he1=parseInt((l-(a-2)*13)/(a-1));he2=parseInt((l-(f-2)*13)/(f-1));var g=new Array();for(var n=0;n<h.length;n++){if(h[n].Upstream!=""&&h[n].Upstream!=null){if(h[n].LevelId!="1"){g.push(h[n].LevelName)}else{c+='<div class="line" style="height:'+he2+'px"></div>';$("#downst").html(h[n].LevelName)}}else{if(h[n].LevelId!="1"&&h[n].LevelId!=a){d+='<div class="st"><div style="margin-left:-180px; width:175px;  text-align:right  ">'+h[n].LevelName+"</div></div>";d+='<div class="line" style="height:'+he1+'px"></div>'}else{if(h[n].LevelId=="1"){d+='<div class="line" style="height:'+he1+'px"></div>';$("#upst").html(h[n].LevelName)}}}}for(var k=g.length-1;k>=0;k--){if(k!=g.length-1){c+='<div class="st"><div style="margin-left:20px; width:175px;  text-align:left ">'+g[k]+"</div></div>";c+='<div class="line" style="height:'+he2+'px"></div>'}}if(d!=""&&c!=""){$("#up").html(d);$("#down").html(c);e=true;$("#showModule").show();$("#loading").fadeOut()}else{$("#RefreshM").show();$("#showModule").hide();e=false}}else{e=false}}});return e}var vlist={};function TogetAll(){var d=0;var c="";var b="";var a="ajax/controller.php?Method=gpsdata&roadline="+RoadLine;$.get(a,function(g){if(g==null||g==""||g==undefined){$("#RefreshM").show();$("#showModule").hide();return false}var g=$.parseJSON(g);var f=g.data;if(f.length>0){for(var e=0;e<f.length;e++){var h="http://116.236.170.106:9001/MobileWeb/ShowData.aspx?which=ad&roadline=&registrationmark=&VehicleNumbering=&AdContent="+f[e].Adcode;c+='<div  id="'+f[e].vnumber+'"  class="dnone" > <div class="tit" onclick="showContent(\''+f[e].vnumber+"')\" >"+f[e].vnumber+'</div>  <div class="stit" onclick="showContent(\''+f[e].vnumber+"')\" ></div></div>";c+=' <div  id="d'+f[e].vnumber+'" class="dnone" style=" width:225px; border:1px solid black;  background-color:white;  z-index:10000; height:133px;  ">';c+='<table border="0" style=" width:100%;text-align: left;"  >';c+="                 <tr><td></td><td></td></tr>";c+='                 <tr><td style=" width:40%">自编号</td><td>'+f[e].vnumber+"["+f[e].vid+"]</td></tr>";c+="                 <tr><td>车速</td><td>"+f[e].Speed+"km/h</td></tr>";c+="                  <tr><td>下一站位置</td><td>"+f[e].wz+"</td></tr>";c+="                 <tr><td>定位时间</td><td>"+f[e].DWTime+"</td></tr>";c+="                 <tr><td>预计到达</td><td>"+f[e].dzsj+"</td></tr>";c+="                 <tr><td>班次信息</td><td>"+f[e].drivername+"</td></tr>";c+="           </table>";c+="       </div>"}d=g.busCount;$("#park").html(c)}else{}if(d<2){}})}var hisid="";function showContent(a){if(hisid!=a){$("#d"+a).removeClass("dnone");$("#d"+hisid).addClass("dnone");$("#dd"+hisid1).addClass("dnone");hisid=a}else{$("#d"+a).addClass("dnone");hisid=""}}var hisid1="";function showContent1(a){if(hisid1!=a){$("#dd"+a).removeClass("dnone");$("#dd"+hisid1).addClass("dnone");$("#d"+hisid).addClass("dnone");hisid1=a}else{$("#dd"+a).addClass("dnone");hisid1=""}}$(document).mouseup(function(b){var a=$("body");if(!a.is(b.target)&&a.has(b.target).length<=1){$("#dd"+hisid1).addClass("dnone");$("#d"+hisid).addClass("dnone");hisid=""}});var mg=0;var isFirst=false;function Move(){if(isFirst){if((new Date().getSeconds())%5!=0){return}}isFirst=true;getScreen();var a=0;var f=13;var g="";var e="";var c=0;var h="";var b="";var d="ajax/controller.php?Method=gpsdata&roadline="+RoadLine;$.ajax({url:d,type:"GET",dataType:"text",cache:false,timeout:8000,error:function(){},success:function(p){vlist={};var k=0;if(p==null||p==""||p==undefined){$("#RefreshM").show();
-$("#showModule").hide();return false}var p=$.parseJSON(p);var l=p.data;if(l.length>0){for(var q=0;q<l.length;q++){c=0;var t="http://116.236.170.106:9001/MobileWeb/ShowData.aspx?which=ad&roadline=&registrationmark=&VehicleNumbering=&AdContent="+l[q].Adcode;if(l[q].state=="营运车辆"){a++;if(l[q].todir=="0"){if(parseInt(l[q].nextlevel)-1>0){c=he1*(parseInt(l[q].nextlevel)-2)+f*(parseInt(l[q].nextlevel)-2)+parseInt(he1*l[q].rate)}else{c=parseInt(he1*l[q].rate)}if(parseInt(l[q].stationid)>-1){if(parseInt(l[q].stationid)==2){c=he1}else{c=he1*(parseInt(l[q].stationid)-1)+f*(parseInt(l[q].stationid)-2)}$("#"+l[q].vnumber).removeClass("dnone").removeClass("point1").addClass("upInSt").css("margin-top",(c)+"px");$("#"+l[q].vnumber).find(".tit").addClass("leftst").html(l[q].vnumber);$("#d"+l[q].vnumber).addClass("leftdi").css("margin-top",c+"px")}else{c+=parseInt(he1*l[q].rate);$("#"+l[q].vnumber).removeClass("dnone").removeClass("upInSt").addClass("point1").css("margin-top",c+"px");$("#"+l[q].vnumber).find(".tit").addClass("leftst").html(l[q].vnumber);$("#d"+l[q].vnumber).addClass("leftdi").css("margin-top",c+"px")}k=c}else{if(parseInt(l[q].nextlevel)-1>0){var n=parseInt(l[q].nextlevel);if(n>=2&&n<$("#down .st").length+2){c=$("#down .st:eq("+($("#down .st").length-parseInt(l[q].nextlevel)+1)+")").offset().top-$("#down").offset().top+he2}}else{c=parseInt(he2*l[q].rate)}if(parseInt(l[q].stationid)>-1){if(parseInt(l[q].stationid)==2){c=he2}else{c=he2*(parseInt(l[q].nextlevel)-1)+f*(parseInt(l[q].stationid))}$("#"+l[q].vnumber).removeClass("dnone").removeClass("point2").addClass("downInSt").css("margin-top",(c)+"px");$("#"+l[q].vnumber).find(".tit").addClass("rightst").html(l[q].vnumber);$("#"+l[q].vnumber).find(".stit").addClass("rightst").html(l[q].vid);$("#d"+l[q].vnumber).addClass("rightdi").css("margin-top",(c)+"px")}else{c+=parseInt(he2*l[q].rate);$("#"+l[q].vnumber).removeClass("dnone").removeClass("downInSt").addClass("point2").css("margin-top",(c)+"px");$("#"+l[q].vnumber).find(".tit").addClass("rightst").html(l[q].vnumber);$("#d"+l[q].vnumber).addClass("rightdi").css("margin-top",(c)+"px")}k=c}$("#d"+l[q].vnumber+" table").find("tr:eq(2)").find("td:eq(1)").text(l[q].Speed+"km/h");$("#d"+l[q].vnumber+" table").find("tr:eq(3)").find("td:eq(1)").text(l[q].wz);$("#d"+l[q].vnumber+" table").find("tr:eq(4)").find("td:eq(1)").text(l[q].DWTime);$("#d"+l[q].vnumber+" table").find("tr:eq(5)").find("td:eq(1)").text(l[q].dzsj);$("#d"+l[q].vnumber+" table").find("tr:eq(6)").find("td:eq(1)").text(l[q].drivername);vlist[l[q].vnumber]=c;var u=parseInt($("#"+l[q].vnumber).css("left"));if(isNaN(u)){u=parseInt($("#"+l[q].vnumber).css("right"))}var j=0;for(var o in vlist){$("#d"+o).addClass("dnone");var s=parseInt($("#"+o).css("left"));if(isNaN(s)){s=parseInt($("#"+o).css("right"))}var r=parseInt($("#"+o).css("marginTop"));if(r<=(k+10)&&r>=(k-10)&&u==s&&!isNaN(s)){$("#"+o).find(".tit").css("margin-top",(j));$("#d"+o).css("margin-top",(k+j));j+=10}}}else{if(l[q].state==getfirst){$("#"+l[q].vnumber).addClass("dnone");$("#"+l[q].vnumber).removeClass("point2");$("#"+l[q].vnumber).find(".tit").removeClass("rightst");if(h==""){h+=(l[q].vnumber==vn0?"<span class='redcolor' onclick='showContent1(\""+l[q].vnumber+"\")'  >"+l[q].vnumber+"</span>":"<span   onclick='showContent1(\""+l[q].vnumber+"\")'>"+l[q].vnumber+"</span>");h+=' <div  id="dd'+l[q].vnumber+'"  class="dnone" style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px; position: absolute;   ">';h+='<table border="0" style=" width:100%;text-align: left;">';h+="                 <tr><td></td><td></td></tr>";h+='              <tr><td style=" width:40%">自编号</td><td>'+l[q].vnumber+"["+l[q].vid+"]</td></tr>";h+="                 <tr><td>车速</td><td>"+l[q].Speed+"km/h</td></tr>";h+="                  <tr><td>下一站位置</td><td>"+l[q].wz+"</td></tr>";h+="                 <tr><td>定位时间</td><td>"+l[q].DWTime+"</td></tr>";h+="                 <tr><td>司机信息</td><td>"+l[q].drivername+"</td></tr>";h+="           </table>";h+="       </div>"}else{h+=","+(l[q].vnumber==vn0?"<span class='redcolor'   onclick='showContent1(\""+l[q].vnumber+"\")'>"+l[q].vnumber+"</span>":"<span   onclick='showContent1(\""+l[q].vnumber+"\")'>"+l[q].vnumber+"</span>");h+=' <div  id="dd'+l[q].vnumber+'"  class="dnone" style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px; position: absolute; ">';h+='<table border="0" style=" width:100%;text-align: left;">';h+="                 <tr><td></td><td></td></tr>";h+='              <tr><td style=" width:40%">自编号</td><td>'+l[q].vnumber+"["+l[q].vid+"]</td></tr>";h+="                 <tr><td>车速</td><td>"+l[q].Speed+"km/h</td></tr>";h+="                  <tr><td>下一站位置</td><td>"+l[q].wz+"</td></tr>";h+="                 <tr><td>定位时间</td><td>"+l[q].DWTime+"</td></tr>";h+="                 <tr><td>司机信息</td><td>"+l[q].drivername+"</td></tr>";h+="           </table>";h+="       </div>"}a++}else{if(l[q].state==getlast){$("#"+l[q].vnumber).addClass("dnone");
-$("#"+l[q].vnumber).removeClass("point1");$("#"+l[q].vnumber).find(".tit").removeClass("leftst");if(b==""){b+=(l[q].vnumber==vn1?"<span class='redcolor'  onclick='showContent1(\""+l[q].vnumber+"\")'>"+l[q].vnumber+"</span>":"<span  onclick='showContent1(\""+l[q].vnumber+"\")'>"+l[q].vnumber+"</span>");b+=' <div  id="dd'+l[q].vnumber+'"  class="dnone"   style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px;position: absolute;  top:-150px  ">';b+='<table border="0" style=" width:100%;text-align: left;">';b+="                  <tr><td></td><td></td></tr>";b+='              <tr><td style=" width:40%">自编号</td><td>'+l[q].vnumber+"["+l[q].vid+"]</td></tr>";b+="                 <tr><td>车速</td><td>"+l[q].Speed+"km/h</td></tr>";b+="                  <tr><td>下一站位置</td><td>"+l[q].wz+"</td></tr>";b+="                 <tr><td>定位时间</td><td>"+l[q].DWTime+"</td></tr>";b+="                 <tr><td>司机信息</td><td>"+l[q].drivername+"</td></tr>";b+="           </table>";b+="       </div>"}else{b+=","+(l[q].vnumber==vn1?"<span class='redcolor'  onclick='showContent1(\""+l[q].vnumber+"\")'>"+l[q].vnumber+"</span>":"<span  onclick='showContent1(\""+l[q].vnumber+"\")'>"+l[q].vnumber+"</span>");b+=' <div  id="dd'+l[q].vnumber+'" class="dnone"   style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px;  position: absolute; top:-150px " >';b+='<table border="0" style=" width:100%;text-align: left;">';b+="                  <tr><td></td><td></td></tr>";b+='              <tr><td style=" width:40%">自编号</td><td>'+l[q].vnumber+"["+l[q].vid+"]</td></tr>";b+="                 <tr><td>车速</td><td>"+l[q].Speed+"km/h</td></tr>";b+="                  <tr><td>下一站位置</td><td>"+l[q].wz+"</td></tr>";b+="                 <tr><td>定位时间</td><td>"+l[q].DWTime+"</td></tr>";b+="                 <tr><td>司机信息</td><td>"+l[q].drivername+"</td></tr>";b+="           </table>";b+="       </div>"}a++}else{if(l[q].state=="报站"){$("#"+l[q].vnumber).removeClass("dnone")}else{$("#"+l[q].vnumber).addClass("dnone");$("#"+l[q].vnumber).removeClass("point1");$("#"+l[q].vnumber).find(".tit").removeClass("leftst");$("#"+l[q].vnumber).removeClass("point2");$("#"+l[q].vnumber).find(".tit").removeClass("rightst")}}}}if(revid==l[q].vid){$("#"+l[q].vnumber).css("color","aqua")}}$("#lastup").html(h);$("#lastdown").html(b);$("#showModule").show();if(hisid!=""){$("#d"+hisid).removeClass("dnone")}$("#loading").fadeOut()}else{}}})}function check(a){}function getMinVa(a){while(a%2>0||a%3>0||a%5>0){if(a%2>0){a=a/2}else{if(a%3>0){a=a/3}else{if(a%5>0){a=a/5}else{break}}}}return a}function getScreen(){var a="ajax/controller.php?roadline="+RoadLine+"&Method=departscreen&startstation=all";$.ajax({url:a,type:"GET",dataType:"text",cache:false,timeout:5000,error:function(){return},success:function(d){var d=$.parseJSON(d);if(d.jhpc!=undefined){$("#busCount").text(d.jhpc)}if(d.dqyy!=undefined){$("#lineCount").text(d.dqyy)}var c=d.data;if(c.length>0){for(var b=0;b<c.length;b++){if(c[b].dir=="0"){$("#plan1").html(parseInt(c[b].jhjg));$("#dplan1").html(parseInt(c[b].yjjg));vn0=c[0].VEHICLENUMBERING;$("#vnup1").html(vn0);$("#timeup1").html(c[b].PLANTIME)}else{$("#plan2").html(parseInt(c[b].jhjg));$("#dplan2").html(parseInt(c[b].yjjg));vn1=c[b].VEHICLENUMBERING;$("#vndown1").html(vn1);$("#timedown1").html(c[b].PLANTIME)}}}}})}function getStartScreen(){var d=0;var c="";var b="";var a="interface/Handler.ashx?action=departscreen&userid=test&password=test&roadline="+RoadLine+"&startstation=all&format=xml";$.get(a,function(e){$(e).find("result").each(function(f){var g=$(this);if(g.attr("dir")=="1"){$("#plan1").html(g.find("jhjg").text());$("#dplan1").html(g.find("yjjg").text());vn0=g.find("Current").find("vnumber").text();$("#vnup1").html(vn0);$("#timeup1").html(g.find("Current").find("depart").text())}else{if(g.attr("dir")=="0"){$("#plan2").html(g.find("jhjg").text());$("#dplan2").html(g.find("yjjg").text());vn1=g.find("Current").find("vnumber").text();$("#vndown1").html(vn1);$("#timedown1").html(g.find("Current").find("depart").text())}}})})}function getWorkBus(){var a="Ajax/Handler.ashx?Method=workBus&roadline="+RoadLine;$.get(a,function(b){$("#WorkCount").html(b)})};
+﻿/// <reference path="jquery-1.4.1.min.js" />
+
+var RoadLine = "926";
+var getfirst = "";
+var getlast = "";
+var vn0 = ""; //定义当前上行发车
+var vn1 = ""; //定义当前下行发车
+var revid = ""; //传参的车辆编号
+$(document).ready(
+		function () {
+		    var urlprm = window.location.search;
+		    if (urlprm != "") {
+		        var prms = urlprm.replace("?", "").split('&');
+		        $(prms).each(function (i) {
+		            var keyvalue = prms[i].split('=');
+		            if (keyvalue[0] == "roadline") {
+		                RoadLine = keyvalue[1];
+		            }
+		            else if (keyvalue[0] == "user") {
+		                if (keyvalue[1] != "test") {
+		                    window.location = "guide.htm";
+		                }
+		            }
+		            if (keyvalue[0] == "vid") {
+		                revid = keyvalue[1];
+		            }
+		        });
+		        if (loadMould()) {
+		            $("#divNull").hide();
+		            Move();
+		            setTimeout(TogetAll, 1000);
+		            // setTimeout(Move, 3000);
+		            setInterval(Move, 1000);
+		        }
+		        else {
+		            $("#divNull").show();
+		            $("#showModule").hide();
+		            $("#loading").fadeOut();
+		        }
+
+		    }
+		    else {
+		        window.location = "guide.php";
+		    }
+
+		});
+
+var he1 = 0;
+var he2 = 0;
+var levelPosition1 = [];
+var levelPosition2 = [];
+//获取站点，显示
+function loadMould() {
+    var isfg = true; //定义返回变量
+    var html1 = "";
+    var html2 = "";
+    var f1 = 0; //开往新开河
+    var f2 = 0; //开往上海体育馆
+    var url = "ajax/controller.php?Method=station&roadline=" + RoadLine;
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'text',
+        async: false,
+        timeout: 5000,
+        error: function () {
+            isfg = false;
+        },
+        success: function (data) {
+            //  alert("aa");
+            if (data == null || data == "" || data == undefined) {
+                $("#RefreshM").show();
+                $("#showModule").hide();
+                $("#loading").fadeOut();
+                isfg = false;
+            }
+            var data = $.parseJSON(data);
+            var jdata = data.data;
+            if (jdata.length > 0) {
+
+                $("#RoadLine").html(jdata[0].RoadLine);
+                for (var i = 0; i < jdata.length; i++) {
+                    if (jdata[i].Upstream != "" && jdata[i].Upstream != null) {
+                        if (f2 == 0) {
+                            getfirst = jdata[i].ToDirection;
+                        }
+                        f2++;
+                    } else {
+                        if (f1 == 0) {
+                            getlast = jdata[i].ToDirection;
+                        }
+                        f1++;
+                    }
+                }
+                //计算站点的长度，均分
+                    for (i = 0; i < jdata.length; i++) {
+                        if (jdata[i].Upstream !== "" && jdata[i].Upstream !== null) {
+                            var dirlength = 0;
+                            var dir0 = i;
+                            var dir1 = jdata.length - dir0;
+                            if (dir1 > dir0) dirlength = dir1;
+                            else dirlength = dir0;
+                            //alert (dirlength);
+                            break;
+                        }
+                    }
+                //dirlength = 890;     
+                if (dirlength > 28) dirlength = (dirlength - 28) * 35 + 890;
+                else if (dirlength < 14 && dirlength > 2) dirlength = 890 - (14-dirlength) * 10.2 * dirlength;
+                else if (dirlength == 2) dirlength = 200;
+                else dirlength = 890;
+                var stationall = document.getElementById('stationall');
+                stationall.style.height = dirlength +"px";
+                he1 = parseInt((dirlength - (f1 - 2) * 13) / (f1 - 1));
+                he2 = parseInt((dirlength - (f2 - 2) * 13) / (f2 - 1));
+                
+                var Anti = new Array();
+                for (var i = 0; i < jdata.length; i++) {
+                    if (jdata[i].Upstream != "" && jdata[i].Upstream != null) {
+                        if (jdata[i].LevelId != "1") {
+
+                            Anti.push(jdata[i].LevelName);
+                        }
+                        else {
+                            html2 += '<div class="line" style="height:' + he2 + 'px"></div>';
+                            $("#downst").html(jdata[i].LevelName);
+                        }
+                    }
+                    else {
+
+                        if (jdata[i].LevelId != "1" && jdata[i].LevelId != f1) {
+                            html1 += '<div class="st"><div style="margin-left:-180px; width:175px;  text-align:right  ">' + jdata[i].LevelName + '</div></div>';
+                            html1 += '<div class="line" style="height:' + he1 + 'px"></div>';
+                        }
+                        else {
+
+                            if (jdata[i].LevelId == "1") {
+                                html1 += '<div class="line" style="height:' + he1 + 'px"></div>';
+                                $("#upst").html(jdata[i].LevelName);
+                            }
+                        }
+                    }
+                }
+                for (var j = Anti.length - 1; j >= 0; j--) {
+                    if (j != Anti.length - 1) {
+                        html2 += '<div class="st"><div style="margin-left:20px; width:175px;  text-align:left ">' + Anti[j] + '</div></div>';
+                        html2 += '<div class="line" style="height:' + he2 + 'px"></div>';
+                    }
+
+                }
+                if (html1 != "" && html2 != "") {
+                    $("#up").html(html1);
+                    $("#down").html(html2);
+                    isfg = true;
+                    $("#showModule").show();
+                    $("#loading").fadeOut();
+                }
+                else {
+                    $("#RefreshM").show();
+                    $("#showModule").hide();
+                    isfg = false;
+                }
+
+
+            }
+            else {
+
+                isfg = false;
+            }
+        }
+    });
+    return isfg;
+}
+
+
+//添加集合存储车辆数据
+var vlist = {};
+
+
+//获取所有车，存放
+function TogetAll() {
+    var busCount = 0; //配车数
+    var html1 = "";
+    var html2 = "";
+    var url = "ajax/controller.php?Method=gpsdata&roadline=" + RoadLine;
+    $.get(url, function (data) {
+
+        if (data == null || data == "" || data == undefined) {
+            $("#RefreshM").show();
+            $("#showModule").hide();
+            return false;
+        }
+        var data = $.parseJSON(data);
+
+        var jdata = data.data;
+        if (jdata.length > 0) {
+            for (var i = 0; i < jdata.length; i++) {
+                var adurl = "http://116.236.170.106:9001/MobileWeb/ShowData.aspx?which=ad&roadline=&registrationmark=&VehicleNumbering=&AdContent=" + jdata[i].Adcode;
+                //  html1 += '<div style="width:200px">';
+                html1 += '<div  id="' + jdata[i].vnumber + '"  class="dnone" > <div class="tit" onclick="showContent(\'' + jdata[i].vnumber + '\')" >' + jdata[i].vnumber + '</div>  <div class="stit" onclick="showContent(\'' + jdata[i].vnumber + '\')" ></div></div>';
+                html1 += ' <div  id="d' + jdata[i].vnumber + '" class="dnone" style=" width:225px; border:1px solid black;  background-color:white;  z-index:10000; height:133px;  ">';
+                html1 += '<table border="0" style=" width:100%;text-align: left;"  >';
+                html1 += '                 <tr><td></td><td></td></tr>';
+                html1 += '                 <tr><td style=" width:40%">自编号</td><td>' + jdata[i].vnumber + '[' + jdata[i].vid + ']</td></tr>';
+                html1 += '                 <tr><td>车速</td><td>' + jdata[i].Speed + 'km/h</td></tr>';
+                html1 += '                  <tr><td>下一站位置</td><td>' + jdata[i].wz + '</td></tr>';
+//                html1 += '                 <tr><td>营运状态</td><td>' + jdata[i].RunStatus + '</td></tr>';
+                html1 += '                 <tr><td>定位时间</td><td>' + jdata[i].DWTime + '</td></tr>';
+//                html1 += '                 <tr><td>广告品牌</td><td><a href="' + adurl + '">' + jdata[i].AdContent + '</a></td></tr>';
+//                html1 += '                 <tr><td>路牌信息</td><td>' + jdata[i].lpname + '</td></tr>';
+                html1 += '                 <tr><td>预计到达</td><td>' + jdata[i].dzsj + '</td></tr>';
+                html1 += '                 <tr><td>班次信息</td><td>' + jdata[i].drivername + '</td></tr>';
+
+
+//                html1 += '                 <tr><td>下刊时间</td><td>' + jdata[i].InsureEndDate + '</td></tr>';
+                html1 += '           </table>';
+                html1 += '       </div>';
+                // html1 += '</div>';
+            }
+
+            //if (data.BusCount > 0) {
+            //   $("#busCount").text(data.BusCount);
+            busCount = data.busCount;
+            $("#park").html(html1);
+            //    return true;
+
+            //}
+            //else {
+            //    $("#RefreshM").show();
+            //    $("#showModule").hide();
+            //    return false;
+            //}
+        }
+        else {
+            //TogetAll();
+        }
+        if (busCount < 2) {
+            //  TogetAll();
+        }
+
+
+    });
+}
+
+var hisid = "";
+function showContent(id) {
+    //for (var i in vlist) {
+    //    //if (man.hasOwnProperty(i)) { //filter,只输出man的私有属性
+    //    //    console.log(i, ":", man[i]);
+    //    //};
+    //    $("#d" + i).addClass("dnone");
+    //    //alert(i);
+
+    //}
+
+    if (hisid != id) {
+        $("#d" + id).removeClass("dnone");
+        $("#d" + hisid).addClass("dnone");
+        $("#dd" + hisid1).addClass("dnone");
+        hisid = id;
+    }
+    else {
+        $("#d" + id).addClass("dnone");
+        hisid = "";
+    }
+    //  alert(id);
+    // $("#d" + id).removeClass("dnone");
+}
+var hisid1 = "";
+function showContent1(id1) {
+
+    if (hisid1 != id1) {
+        $("#dd" + id1).removeClass("dnone");
+        $("#dd" + hisid1).addClass("dnone");
+        $("#d" + hisid).addClass("dnone");
+        hisid1 = id1;
+    }
+    else {
+        $("#dd" + id1).addClass("dnone");
+        hisid1 = "";
+    }
+    //  alert(id);
+    // $("#d" + id).removeClass("dnone");
+}
+
+/* Mark 1 的原理：
+判断点击事件发生在区域外的条600030件是：
+1. 点击事件的对象不是目标区域本身
+2. 事件对象同时也不是目标区域的子元素
+*/
+$(document).mouseup(function (e) {
+    var _con = $('body');   // 设置目标区域
+    if (!_con.is(e.target) && _con.has(e.target).length <= 1) { // Mark 1
+        $("#dd" + hisid1).addClass("dnone");
+        $("#d" + hisid).addClass("dnone");
+        hisid = "";
+    }
+});
+//function hideCont() {
+
+//    var _con = $('body');   // 设置目标区域
+//    if (!_con.is(e.target) && _con.has(e.target).length === 0) { // Mark 1
+//        $("#dd" + hisid1).addClass("dnone");
+//        $("#d" + hisid).addClass("dnone");
+//    }
+
+
+//}
+
+
+
+//展示车辆处于什么位置
+var mg = 0;
+var isFirst = false;
+function Move() {
+    //getStartScreen();
+    if (isFirst) {
+        if ((new Date().getSeconds()) % 5 != 0) {
+            //console.log("秒：" + new Date().getSeconds());
+            return;
+        }
+    }
+    isFirst = true;
+    getScreen();
+
+    var LineCount = 0; //发车数
+    var zdtb = 13;
+    var html1 = "";
+    var html2 = "";
+    var Busrun = 0;
+    var lastup = "";
+    var lastdown = "";
+
+    var url = "ajax/controller.php?Method=gpsdata&roadline=" + RoadLine;
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'text',
+        cache: false,
+        //      async: false,
+        timeout: 8000,
+        error: function () {
+            //alert("服务器超时，请稍后再试！");
+        },
+        success: function (data) {
+            //alert(data);
+            //  alert("aa");
+            vlist = {};
+            var topNum = 0;
+            //  var updown = "upInSt";
+            if (data == null || data == "" || data == undefined) {
+                $("#RefreshM").show();
+                $("#showModule").hide();
+                return false;
+            }
+            var data = $.parseJSON(data);
+            var jdata = data.data;
+
+            if (jdata.length > 0) {
+                for (var i = 0; i < jdata.length; i++) {
+                    Busrun = 0;
+                    var adurl = "http://116.236.170.106:9001/MobileWeb/ShowData.aspx?which=ad&roadline=&registrationmark=&VehicleNumbering=&AdContent=" + jdata[i].Adcode;
+                    if (jdata[i].state == "营运车辆") {
+                        LineCount++;
+
+                        if (jdata[i].todir == "0") {
+                            if (parseInt(jdata[i].nextlevel) - 1 > 0) {
+                                Busrun = he1 * (parseInt(jdata[i].nextlevel) - 2) + zdtb * (parseInt(jdata[i].nextlevel) - 2) + parseInt(he1 * jdata[i].rate);
+                            }
+                            else {
+                                Busrun = parseInt(he1 * jdata[i].rate);
+                            }
+                            if (parseInt(jdata[i].stationid) > -1) {
+                                if (parseInt(jdata[i].stationid) == 2) {
+                                    Busrun = he1;
+                                }
+                                else {
+                                    Busrun = he1 * (parseInt(jdata[i].stationid) - 1) + zdtb * (parseInt(jdata[i].stationid) - 2);
+                                }
+                                $("#" + jdata[i].vnumber).removeClass("dnone").removeClass("point1").addClass("upInSt").css("margin-top", (Busrun) + "px");
+                                $("#" + jdata[i].vnumber).find(".tit").addClass("leftst").html(jdata[i].vnumber);
+                                //$("#" + jdata[i].vnumber).find(".stit").addClass("leftst").html(jdata[i].vid);
+
+
+                                //  $("#d" + jdata[i].vnumber).addClass("leftdi");
+                                $("#d" + jdata[i].vnumber).addClass("leftdi").css("margin-top", Busrun + "px");
+
+                            }
+                            else {
+                                Busrun += parseInt(he1 * jdata[i].rate)
+                                $("#" + jdata[i].vnumber).removeClass("dnone").removeClass("upInSt").addClass("point1").css("margin-top", Busrun + "px");
+                                $("#" + jdata[i].vnumber).find(".tit").addClass("leftst").html(jdata[i].vnumber );
+                              //  $("#" + jdata[i].vnumber).find(".stit").addClass("leftst").html(jdata[i].vid);
+                                $("#d" + jdata[i].vnumber).addClass("leftdi").css("margin-top", Busrun + "px");
+                            }
+
+                            //  vlist[jdata[i].vnumber] = Busrun;
+                            topNum = Busrun;
+
+                        }
+                        else {
+                            if (parseInt(jdata[i].nextlevel) - 1 > 0) {
+
+                                //Busrun = he2 * (parseInt(jdata[i].nextlevel) - 2) + zdtb * (parseInt(jdata[i].nextlevel) - 2) + parseInt(he2 * jdata[i].rate);
+                                //  console.log(($('#down .st').length - parseInt(jdata[i].nextlevel) + 1));
+                                var nextlevel = parseInt(jdata[i].nextlevel);
+                                if (nextlevel >= 2 && nextlevel < $('#down .st').length + 2) {
+                                    Busrun = $('#down .st:eq(' + ($('#down .st').length - parseInt(jdata[i].nextlevel) + 1) + ')').offset().top - $('#down').offset().top + he2;
+                                }
+                            }
+                            else {
+                                Busrun = parseInt(he2 * jdata[i].rate);
+
+                            }
+                            if (parseInt(jdata[i].stationid) > -1) {
+                                if (parseInt(jdata[i].stationid) == 2) {
+                                    Busrun = he2;
+                                }
+                                else {
+                                    Busrun = he2 * (parseInt(jdata[i].nextlevel) - 1) + zdtb * (parseInt(jdata[i].stationid));
+                                }
+                                $("#" + jdata[i].vnumber).removeClass("dnone").removeClass("point2").addClass("downInSt").css("margin-top", (/*890 -*/Busrun) + "px");
+                                $("#" + jdata[i].vnumber).find(".tit").addClass("rightst").html(jdata[i].vnumber );
+                                $("#" + jdata[i].vnumber).find(".stit").addClass("rightst").html(jdata[i].vid);
+                                //   $("#d" + jdata[i].vnumber).addClass("rightdi");
+                                $("#d" + jdata[i].vnumber).addClass("rightdi").css("margin-top", (/*890 -*/Busrun) + "px");
+                            }
+                            else {
+                                Busrun += parseInt(he2 * jdata[i].rate);
+                                $("#" + jdata[i].vnumber).removeClass("dnone").removeClass("downInSt").addClass("point2").css("margin-top", (/*890 -*/Busrun) + "px");
+                                $("#" + jdata[i].vnumber).find(".tit").addClass("rightst").html(jdata[i].vnumber );
+                         //       $("#" + jdata[i].vnumber).find(".stit").addClass("rightst").html(jdata[i].vid);
+                                $("#d" + jdata[i].vnumber).addClass("rightdi").css("margin-top", (/*890 -*/Busrun) + "px");
+
+                            }
+                            topNum = /* 890 -*/Busrun;
+                        }
+                        //添加属性
+                        $("#d" + jdata[i].vnumber + " table").find("tr:eq(2)").find("td:eq(1)").text(jdata[i].Speed + "km/h");
+                       $("#d" + jdata[i].vnumber + " table").find("tr:eq(3)").find("td:eq(1)").text(jdata[i].wz);
+                       // $("#d" + jdata[i].vnumber + " table").find("tr:eq(4)").find("td:eq(1)").text(jdata[i].RunStatus);
+                        $("#d" + jdata[i].vnumber + " table").find("tr:eq(4)").find("td:eq(1)").text(jdata[i].DWTime);
+                        //$("#d" + jdata[i].vnumber + " table").find("tr:eq(5)").find("td:eq(1)").text(jdata[i].drivername);
+ //                       $("#d" + jdata[i].vnumber + " table").find("tr:eq(5)").find("td:eq(1)").text(jdata[i].lpname);
+                        $("#d" + jdata[i].vnumber + " table").find("tr:eq(5)").find("td:eq(1)").text(jdata[i].dzsj);
+                        $("#d" + jdata[i].vnumber + " table").find("tr:eq(6)").find("td:eq(1)").text(jdata[i].drivername);
+
+                        //   $("tb" + jdata[i].vnumber).find("tr:eq(1)").find("td:lt(1):gt(1)").val(jdata[i].Speed);
+                        //   alert($("#d" + jdata[i].vnumber + " table").find("tr:eq(3)").find("td:eq(1)").val())
+                        //   break;
+                        vlist[jdata[i].vnumber] = Busrun;
+                        var ylr = parseInt($("#" + jdata[i].vnumber).css('left'));
+                        if (isNaN(ylr))
+                            ylr = parseInt($("#" + jdata[i].vnumber).css('right'));
+                        //alert(ylr);
+                        var mt = 0;
+                        for (var m in vlist) {
+                            //if (man.hasOwnProperty(i)) { //filter,只输出man的私有属性
+                            //    console.log(i, ":", man[i]);
+                            //};
+                            //if (jdata[i].vnumber == m)
+                            //    continue;
+                            $("#d" + m).addClass("dnone");
+
+                            var lr = parseInt($("#" + m).css('left'));
+                            if (isNaN(lr))
+                                lr = parseInt($("#" + m).css('right'));
+                            var num = parseInt($("#" + m).css('marginTop'));
+
+                            if (num <= (topNum + 10) && num >= (topNum - 10) && ylr == lr && !isNaN(lr)) {
+
+                                $("#" + m).find(".tit").css("margin-top", (mt));
+                                $("#d" + m).css("margin-top", (topNum + mt));
+                                // alert(m);
+                                mt += 10;
+                                // break;
+                                // setTimeout(1000);
+                            }
+
+                            //alert(i);
+
+                        }
+                    }
+                    else if (jdata[i].state == getfirst) {
+                        $("#" + jdata[i].vnumber).addClass("dnone");
+                        $("#" + jdata[i].vnumber).removeClass("point2");
+                        $("#" + jdata[i].vnumber).find(".tit").removeClass("rightst");
+                        if (lastup == "") {
+                            lastup += (jdata[i].vnumber == vn0 ? "<span class='redcolor' onclick='showContent1(\"" + jdata[i].vnumber + "\")'  >" + jdata[i].vnumber + "</span>" : "<span   onclick='showContent1(\"" + jdata[i].vnumber + "\")'>" + jdata[i].vnumber + "</span>");
+                            lastup += ' <div  id="dd' + jdata[i].vnumber + '"  class="dnone" style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px; position: absolute;   ">';
+                            lastup += '<table border="0" style=" width:100%;text-align: left;">';
+                            lastup += '                 <tr><td></td><td></td></tr>';
+                            lastup += '              <tr><td style=" width:40%">自编号</td><td>' + jdata[i].vnumber + '[' + jdata[i].vid + ']</td></tr>';
+                            lastup += '                 <tr><td>车速</td><td>' + jdata[i].Speed + 'km/h</td></tr>';
+                            lastup += '                  <tr><td>下一站位置</td><td>' + jdata[i].wz + '</td></tr>';
+//                            lastup += '                 <tr><td>营运状态</td><td>' + jdata[i].RunStatus + '</td></tr>';
+                            lastup += '                 <tr><td>定位时间</td><td>' + jdata[i].DWTime + '</td></tr>';
+//                            lastup += '                 <tr><td>广告品牌</td><td><a href="' + adurl + '">' + jdata[i].AdContent + '</a></td></tr>';
+                lastup += '                 <tr><td>司机信息</td><td>' + jdata[i].drivername + '</td></tr>';
+//                            lastup += '                 <tr><td>预计到达</td><td>' + jdata[i].dzsj + '</td></tr>';
+
+//                            lastup += '                 <tr><td>下刊时间</td><td>' + jdata[i].InsureEndDate + '</td></tr>';
+                            lastup += '           </table>';
+                            lastup += '       </div>';
+                        } else {
+                            lastup += "," + (jdata[i].vnumber == vn0 ? "<span class='redcolor'   onclick='showContent1(\"" + jdata[i].vnumber + "\")'>" + jdata[i].vnumber + "</span>" : "<span   onclick='showContent1(\"" + jdata[i].vnumber + "\")'>" + jdata[i].vnumber + "</span>");
+                            lastup += ' <div  id="dd' + jdata[i].vnumber + '"  class="dnone" style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px; position: absolute; ">';
+                            lastup += '<table border="0" style=" width:100%;text-align: left;">';
+                            lastup += '                 <tr><td></td><td></td></tr>';
+                            lastup += '              <tr><td style=" width:40%">自编号</td><td>' + jdata[i].vnumber + '[' + jdata[i].vid + ']</td></tr>';
+                            lastup += '                 <tr><td>车速</td><td>' + jdata[i].Speed + 'km/h</td></tr>';
+                          lastup += '                  <tr><td>下一站位置</td><td>' + jdata[i].wz + '</td></tr>';
+//                            lastup += '                 <tr><td>营运状态</td><td>' + jdata[i].RunStatus + '</td></tr>';
+                            lastup += '                 <tr><td>定位时间</td><td>' + jdata[i].DWTime + '</td></tr>';
+//                            lastup += '                 <tr><td>广告品牌</td><td><a href="' + adurl + '">' + jdata[i].AdContent + '</a></td></tr>';
+                lastup += '                 <tr><td>司机信息</td><td>' + jdata[i].drivername + '</td></tr>';
+//                            lastup += '                 <tr><td>预计到达</td><td>' + jdata[i].dzsj + '</td></tr>';
+
+//                            lastup += '                 <tr><td>下刊时间</td><td>' + jdata[i].InsureEndDate + '</td></tr>';
+                            lastup += '           </table>';
+                            lastup += '       </div>';
+                        }
+                        LineCount++;
+                    }
+                    else if (jdata[i].state == getlast) {
+                        $("#" + jdata[i].vnumber).addClass("dnone");
+                        $("#" + jdata[i].vnumber).removeClass("point1");
+                        $("#" + jdata[i].vnumber).find(".tit").removeClass("leftst");
+                        if (lastdown == "") {
+                            lastdown += (jdata[i].vnumber == vn1 ? "<span class='redcolor'  onclick='showContent1(\"" + jdata[i].vnumber + "\")'>" + jdata[i].vnumber + "</span>" : "<span  onclick='showContent1(\"" + jdata[i].vnumber + "\")'>" + jdata[i].vnumber + "</span>");
+                            lastdown += ' <div  id="dd' + jdata[i].vnumber + '"  class="dnone"   style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px;position: absolute;  top:-150px  ">';
+                            lastdown += '<table border="0" style=" width:100%;text-align: left;">';
+                            lastdown += '                  <tr><td></td><td></td></tr>';
+                            lastdown += '              <tr><td style=" width:40%">自编号</td><td>' + jdata[i].vnumber + '[' + jdata[i].vid + ']</td></tr>';
+                            lastdown += '                 <tr><td>车速</td><td>' + jdata[i].Speed + 'km/h</td></tr>';
+                            lastdown += '                  <tr><td>下一站位置</td><td>' + jdata[i].wz + '</td></tr>';
+//                            lastdown += '                 <tr><td>营运状态</td><td>' + jdata[i].RunStatus + '</td></tr>';
+                            lastdown += '                 <tr><td>定位时间</td><td>' + jdata[i].DWTime + '</td></tr>';
+//                            lastdown += '                 <tr><td>广告品牌</td><td><a href="' + adurl + '">' + jdata[i].AdContent + '</a></td></tr>';
+                lastdown += '                 <tr><td>司机信息</td><td>' + jdata[i].drivername + '</td></tr>';
+//                            lastdown += '                 <tr><td>预计到达</td><td>' + jdata[i].dzsj + '</td></tr>';
+
+//                            lastdown += '                 <tr><td>下刊时间</td><td>' + jdata[i].InsureEndDate + '</td></tr>';
+                            lastdown += '           </table>';
+                            lastdown += '       </div>';
+                        } else {
+                            lastdown += "," + (jdata[i].vnumber == vn1 ? "<span class='redcolor'  onclick='showContent1(\"" + jdata[i].vnumber + "\")'>" + jdata[i].vnumber + "</span>" : "<span  onclick='showContent1(\"" + jdata[i].vnumber + "\")'>" + jdata[i].vnumber + "</span>");
+                            lastdown += ' <div  id="dd' + jdata[i].vnumber + '" class="dnone"   style=" width:220px; border:1px solid black;  background-color:white;  z-index:1000; height:110px;  position: absolute; top:-150px " >';
+                            lastdown += '<table border="0" style=" width:100%;text-align: left;">';
+                            lastdown += '                  <tr><td></td><td></td></tr>';
+                            lastdown += '              <tr><td style=" width:40%">自编号</td><td>' + jdata[i].vnumber + '[' + jdata[i].vid + ']</td></tr>';
+
+                            lastdown += '                 <tr><td>车速</td><td>' + jdata[i].Speed + 'km/h</td></tr>';
+                           lastdown += '                  <tr><td>下一站位置</td><td>' + jdata[i].wz + '</td></tr>';
+//                            lastdown += '                 <tr><td>营运状态</td><td>' + jdata[i].RunStatus + '</td></tr>';
+                            lastdown += '                 <tr><td>定位时间</td><td>' + jdata[i].DWTime + '</td></tr>';
+//                            lastdown += '                 <tr><td>广告品牌</td><td><a href="' + adurl + '">' + jdata[i].AdContent + '</a></td></tr>';
+                lastdown += '                 <tr><td>司机信息</td><td>' + jdata[i].drivername + '</td></tr>';
+//                            lastdown += '                 <tr><td>预计到达</td><td>' + jdata[i].dzsj + '</td></tr>';
+
+//                            lastdown += '                 <tr><td>下刊时间</td><td>' + jdata[i].InsureEndDate + '</td></tr>';
+                            lastdown += '           </table>';
+                            lastdown += '       </div>';
+                        }
+                        LineCount++;
+                    }
+                    else if (jdata[i].state == "报站") {
+                        $("#" + jdata[i].vnumber).removeClass("dnone");
+                    }
+                    else {
+                        $("#" + jdata[i].vnumber).addClass("dnone");
+                        $("#" + jdata[i].vnumber).removeClass("point1");
+                        $("#" + jdata[i].vnumber).find(".tit").removeClass("leftst");
+                        $("#" + jdata[i].vnumber).removeClass("point2");
+                        $("#" + jdata[i].vnumber).find(".tit").removeClass("rightst");
+                    }
+                    //判断是否有车牌号
+                    if (revid == jdata[i].vid) {
+                        $("#" + jdata[i].vnumber).css("color", "aqua");
+                    }
+                }
+                //  $("#lineCount").text(LineCount);
+                // getWorkBus();//当前营运车辆
+                $("#lastup").html(lastup);
+                $("#lastdown").html(lastdown);
+
+                $("#showModule").show();
+                if (hisid != "") {
+                    $("#d" + hisid).removeClass("dnone");
+                }
+                $("#loading").fadeOut();
+            }
+            else {
+                //  Move(); 
+            }
+        }
+    });
+}
+
+
+function check(v) {
+
+}
+
+function getMinVa(f) {
+    while (f % 2 > 0 || f % 3 > 0 || f % 5 > 0) {
+
+        if (f % 2 > 0) {
+            f = f / 2;
+        }
+        else if (f % 3 > 0) {
+            f = f / 3;
+        }
+        else if (f % 5 > 0) {
+            f = f / 5;
+        }
+        else {
+            break;
+        }
+
+    }
+    return f;
+}
+
+//得到发车屏信息 by sjlleo -2019-03-26
+function getScreen() {
+    var url = "ajax/controller.php?roadline=" + RoadLine + "&Method=departscreen&startstation=all";
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'text',
+        cache: false,
+        //  async: false,
+        timeout: 5000,
+        error: function () {
+            return;
+        },
+        success: function (data) {
+            var data = $.parseJSON(data);
+            if (data.jhpc != undefined) {
+                $('#busCount').text(data.jhpc);
+            }
+            if (data.dqyy != undefined) {
+                $('#lineCount').text(data.dqyy);
+            }
+            var jdata = data.data;
+            if (jdata.length > 0) {
+                for (var i = 0; i < jdata.length; i++) {
+                    if (jdata[i].dir == "0") {
+                        $("#plan1").html(parseInt(jdata[i].jhjg));
+                        $("#dplan1").html(parseInt(jdata[i].yjjg));
+                        vn0 = jdata[0].VEHICLENUMBERING;
+                        $("#vnup1").html(vn0);
+                        // $("#" + vn1).css("color", "red");
+                        $("#timeup1").html(jdata[i].PLANTIME);
+                    }
+                    else {
+                        $("#plan2").html(parseInt(jdata[i].jhjg));
+                        $("#dplan2").html(parseInt(jdata[i].yjjg));
+                        vn1 = jdata[i].VEHICLENUMBERING;
+                        $("#vndown1").html(vn1);
+                        //   $("#" + vn0).addClass("redcolor");
+                        $("#timedown1").html(jdata[i].PLANTIME);
+                    }
+                }
+
+
+            }
+        }
+    });
+}
+
+//得到发车屏信息
+function getStartScreen() {
+    var busCount = 0; //配车数
+    var html1 = "";
+    var html2 = "";
+    var url = "interface/Handler.ashx?action=departscreen&userid=test&password=test&roadline=" + RoadLine + "&startstation=all&format=xml";
+    $.get(url, function (data) {
+        $(data).find('result').each(function (i) {
+            var $xml = $(this);
+            //  var aa = $xml.find('vnumber').text();
+            if ($xml.attr("dir") == "1") {
+                $("#plan1").html($xml.find('jhjg').text());
+                $("#dplan1").html($xml.find('yjjg').text());
+                vn0 = $xml.find('Current').find('vnumber').text();
+                $("#vnup1").html(vn0);
+                // $("#" + vn1).css("color", "red");
+                $("#timeup1").html($xml.find('Current').find('depart').text());
+            }
+            else if ($xml.attr("dir") == "0") {
+                $("#plan2").html($xml.find('jhjg').text());
+                $("#dplan2").html($xml.find('yjjg').text());
+                vn1 = $xml.find('Current').find('vnumber').text();
+                $("#vndown1").html(vn1);
+                //   $("#" + vn0).addClass("redcolor");
+                $("#timedown1").html($xml.find('Current').find('depart').text());
+
+            }
+
+        });
+
+
+
+    });
+}
+
+//获取营运数据
+function getWorkBus() {
+    //var workCount = 0; //营运车数
+    var url = "Ajax/Handler.ashx?Method=workBus&roadline=" + RoadLine;
+    $.get(url, function (data) {
+        $("#WorkCount").html(data);
+    });
+}

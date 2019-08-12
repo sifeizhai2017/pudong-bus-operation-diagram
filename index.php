@@ -12,8 +12,6 @@ $roadline = $rzw -> zw ;
         $_SESSION['busp'][$x] = $roadline;
     }
     else $_SESSION['busp'][1] = $roadline;
-    //echo $_SESSION['bus'][1];
-    if(strpos($_SERVER['HTTP_REFERER'],'shbus.eu.org')==false) $reminder = true;
 ?>
 ﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">

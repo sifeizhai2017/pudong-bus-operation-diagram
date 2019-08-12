@@ -840,14 +840,14 @@
                         <div class="history">
         <div class="h-title">历史查询</div>
         <div class="h-items">
-            <?php session_start();
-            //echo $_SESSION['bus'][1];
-            $arr = array();
-            $arr = $_SESSION['busp'];
-            $arr = array_unique($arr);
-            foreach ($arr as $a => $b) {
-                echo '<a href="pudong/?roadline='.$b.'">'.$b.'</a> ';
-            }
+            <?php 
+		session_start();
+                $arr = array();
+                $arr = $_SESSION['busp'];
+                $arr = array_unique($arr);
+                foreach ($arr as $a => $b) {
+                    echo '<a href="./pudong/?roadline='.$b.'">'.$b.'</a> ';
+                }
             ?>
                     </div>
         </article>

@@ -848,7 +848,7 @@
                 $arr = $_SESSION['busp'];
                 $arr = array_unique($arr);
                 foreach ($arr as $a => $b) {
-                    echo '<a href="./pudong/?roadline='.$b.'">'.$b.'</a> ';
+                    echo '<a href="./?roadline='.$b.'">'.$b.'</a> ';
                 }
             ?>
                     </div>

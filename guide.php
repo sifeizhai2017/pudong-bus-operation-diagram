@@ -836,7 +836,7 @@
                 <p>
                     <span>1、</span>请输入浦东公交的线路 如"576路"、"沪南线"、"外高桥3路"、"989路";</p>          
 	        <p>
-                    <span>1、</span>❤ Made By <a href="https://github.com/sjlleo/pudong-bus-operation-diagram">Leo</a></p> 
+                    <span>2、</span>❤ Made By <a href="https://github.com/sjlleo/pudong-bus-operation-diagram">Leo</a></p> 
                <p>
             </div>
                         <div class="history">

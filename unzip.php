@@ -1,7 +1,7 @@
 <?php
 $zip = new ZipArchive;
 if ($zip->open('file.zip') === TRUE) {
-    $zip->extractTo('/my/destination/dir/');
+    $zip->extractTo('');
     $zip->close();
     echo 'ok';
 } else {

@@ -510,7 +510,7 @@ function gps_data_get($roadline,$line_start,$line_end,$line_id,$station_data)
 
 function departscreen($line_id,$roadline)
 {
-    $json_string = file_get_contents('./nbbm2PlateNo.json');
+    $json_string = file_get_contents('nbbm2PlateNo.json');
     //读取车牌与自编号信息文件
     
     $arr = json_decode($json_string,true);
@@ -574,7 +574,7 @@ function departscreen($line_id,$roadline)
         $data1 = array('dir'=>0,'VEHICLENUMBERING'=>$d1_car,'PLANTIME'=>$data[0]['time'],'jhjg'=>$jhjg,'yjjg'=>$yjjg );
         
         $data2['jhpc']=0;$data2['dqyy']=0;
-        $file = "./pc/$roadline.json";
+        $file = "pc/$roadline.json";
         if(file_exists($file)){
         $data2 = file_get_contents($file); //读取缓存
         $data2 = json_decode($data2,true);

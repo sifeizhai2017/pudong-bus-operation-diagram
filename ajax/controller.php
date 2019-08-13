@@ -51,7 +51,7 @@ function check($roadline,$function)
 
 function get_line_id_v2($roadline)
 {
-        $file = "./lines.json";
+        $file = "lines.json";
         $data = file_get_contents($file); //读取缓存
         $data = json_decode($data,true);
         foreach ($data as $k => $v)
@@ -128,7 +128,7 @@ function get_line_id($roadline)
 
 function stop_info($roadline,$line_id)
 {
-    $file = "./line/$roadline.json";
+    $file = "line/$roadline.json";
     if(!file_exists($file)){   //判断线路站点是否已经被缓存
     $url = "http://180.168.57.114:8380/bsth_kxbus/GetDateHttpUtils/Getlinexx.do";
     //设置post数据
@@ -150,7 +150,7 @@ function stop_info($roadline,$line_id)
 function station_output_A($roadline,$data)
 {
     //降低api服务器压力，加快反馈速度（此处做缓存）
-    $file = "./line/$roadline.json";
+    $file = "line/$roadline.json";
     if(file_exists($file)){
         $data = file_get_contents($file); //读取缓存
     }
@@ -237,7 +237,7 @@ function station_output_B($roadline,$output,$direction)
 function gps_data_get($roadline,$line_start,$line_end,$line_id,$station_data)
 {
     
-    $json_string = file_get_contents('./nbbm2PlateNo.json');
+    $json_string = file_get_contents('nbbm2PlateNo.json');
     $arr = json_decode($json_string,true);
     $info_driver = drivername($line_id);
     //去程

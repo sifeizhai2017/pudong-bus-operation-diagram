@@ -2,7 +2,7 @@
 
 
 /*
-    2019-06-17 浦交模拟图V2 Beta
+    2019-08-17 浦交模拟图V2.3
     Made by Leo
 */
 
@@ -51,7 +51,7 @@ function check($roadline,$function)
 
 function get_line_id_v2($roadline)
 {
-        $file = "lines.json";
+        $file = "./lines.json";
         $data = file_get_contents($file); //读取缓存
         $data = json_decode($data,true);
         foreach ($data as $k => $v)
@@ -128,7 +128,7 @@ function get_line_id($roadline)
 
 function stop_info($roadline,$line_id)
 {
-    $file = "line/$roadline.json";
+    $file = "./line/$roadline.json";
     if(!file_exists($file)){   //判断线路站点是否已经被缓存
     $url = "http://180.168.57.114:8380/bsth_kxbus/GetDateHttpUtils/Getlinexx.do";
     //设置post数据
@@ -150,7 +150,7 @@ function stop_info($roadline,$line_id)
 function station_output_A($roadline,$data)
 {
     //降低api服务器压力，加快反馈速度（此处做缓存）
-    $file = "line/$roadline.json";
+    $file = "./line/$roadline.json";
     if(file_exists($file)){
         $data = file_get_contents($file); //读取缓存
     }
@@ -219,11 +219,14 @@ function station_output_B($roadline,$output,$direction)
     }
     
     $data = array();
+    
+    $find = 'start_';
 
     foreach ($output['lineResults'.$direction]['stop'] as $id => $zdmc){
-       $data1 = array('RoadLine'=> $roadline , 'Upmax'=>$sumup, 'LevelName' => $zdmc['zdmc'] , 'LevelId' => $id+1 ,'Stationid' => $zdmc['id'],'Upstream' => $Upstream,'Downstream'=> $Downstream,'ToDirection' => $finalup);
-       $x++;
-       $data = array_merge($data,array($x=>$data1));
+        if (strpos($zdmc['id'],$find)!==false) $zdmc['id'] = substr_replace($zdmc['id'],"",0,6);
+        $data1 = array('RoadLine'=> $roadline , 'Upmax'=>$sumup, 'LevelName' => $zdmc['zdmc'] , 'LevelId' => $id+1 ,'Stationid' => $zdmc['id'],'Upstream' => $Upstream,'Downstream'=> $Downstream,'ToDirection' => $finalup);
+        $x++;
+        $data = array_merge($data,array($x=>$data1));
        //数据合并
     }
 
@@ -237,11 +240,11 @@ function station_output_B($roadline,$output,$direction)
 function gps_data_get($roadline,$line_start,$line_end,$line_id,$station_data)
 {
     
-    $json_string = file_get_contents('nbbm2PlateNo.json');
+    $json_string = file_get_contents('./nbbm2PlateNo.json');
     $arr = json_decode($json_string,true);
     $info_driver = drivername($line_id);
     //去程
-    $url = "http://180.166.5.82:9777/gps/findByLineAndUpDown?lineCode=$line_id&upDown=0";
+    $url = "http://180.166.5.82:9777/gps/findByLineAndUpDown?lineCode=$line_id&upDown=0&t=".rand();
     $data = json_decode(data_get($url,'','GET'),true);
     //计算配车
     $jhpc = count($data['list']);
@@ -336,13 +339,12 @@ function gps_data_get($roadline,$line_start,$line_end,$line_id,$station_data)
         }
 
         $v_info['seconds2'] = -$v_info['seconds2'];
-        //if ((empty($v_info['distance']) or $v_info['seconds2'] > 30 or !empty($v_info['parkCode'] and (time() - $v_info['serverTimestamp']/1000) > 120)) and empty($v_info['sch']['lpName']) and $res[$x]['state'] <> $v_info['stationName'] or $v_info['sch']['inOut'] == 'true'){$res[$x]['state'] = '停车场';$sjyy++;}
-        
+
         if (!empty($v_info['sch']['lpName']))
         {
-            if($v_info['sch']['inOut'] == 'true') {$res[$x]['state'] = '停车场';$sjyy++;}
+            if($v_info['sch']['inOut'] == 'true' or (time() - $v_info['serverTimestamp']/1000) > 720) {$res[$x]['state'] = '停车场';$sjyy++;}
         }
-        elseif (empty($v_info['stationName'])) {
+        elseif (!empty($v_info['parkCode'])) {
             $res[$x]['state'] = '停车场';
             $sjyy++;
         }
@@ -399,7 +401,7 @@ function gps_data_get($roadline,$line_start,$line_end,$line_id,$station_data)
     }
     
     //回程
-    $url = "http://180.166.5.82:9777/gps/findByLineAndUpDown?lineCode=$line_id&upDown=1";
+    $url = "http://180.166.5.82:9777/gps/findByLineAndUpDown?lineCode=$line_id&upDown=1&t=".rand();
     $data = json_decode(data_get($url,'','GET'),true);
     
     $arr3 = first_stop($line_id,1,$station_data);
@@ -510,7 +512,7 @@ function gps_data_get($roadline,$line_start,$line_end,$line_id,$station_data)
 
 function departscreen($line_id,$roadline)
 {
-    $json_string = file_get_contents('nbbm2PlateNo.json');
+    $json_string = file_get_contents('./nbbm2PlateNo.json');
     //读取车牌与自编号信息文件
     
     $arr = json_decode($json_string,true);
@@ -544,9 +546,47 @@ function departscreen($line_id,$roadline)
         if ($yjjg < 0) $yjjg = $jhjg;
         if (empty($data[0]['time'])) {$data[0]['time'] = $data['time'];}
         
-        //if (empty($d0_car)) $d0_car = 'SQL Error';
-
-        $data0 = array('dir'=>1,'VEHICLENUMBERING'=>$d0_car,'PLANTIME'=>$data[0]['time'],'jhjg'=>$jhjg,'yjjg'=>$yjjg );
+        if (strtotime($data[0]['time']) < time())
+        {
+            if(!empty($data[1]['time']))
+            {
+                if (strtotime($data[1]['time']) > time()) 
+                {
+                    $data[0]['time'] = $data[1]['time'];
+                    foreach($arr as $t1 => $t2) if ($t2 == $data[1]['vehicle'] ) $d0_car = $t1;
+                    $jhjg = $yjjg;
+                }
+                elseif(!empty($data[2]['time']))
+                {
+                    if (strtotime($data[2]['time']) > time()) 
+                    {
+                        $data[0]['time'] = $data[2]['time'];
+                        foreach($arr as $t1 => $t2) if ($t2 == $data[2]['vehicle'] ) $d0_car = $t1;
+                        $jhjg = $yjjg;
+                    }
+                }
+            }
+        }
+        
+        
+        /*
+            判断发车时间是否正常
+            判断第一个时间是否在当前时间后
+                在当前时间后 -- 正常，跳出判断
+                在当前时间前 -- 异常，
+                判断第二个时间是否存在
+                    存在 -- 判断第二个时间是否在当前时间后
+                            在当前时间后 -- 正常，把二的时间显示，跳出判断
+                            在当前时间前 -- 异常，判断第三个时间是否存在
+                                存在 -- 判断第三个时间是否在当前时间后
+                                    在当前时间后 -- 正常，把三的时间显示，跳出判断
+                                    在当前时间前 -- 异常，返回null
+                                不存在 -- 返回null
+                    不存在 -- 返回null
+                    
+        */
+        
+        $data0 = array('dir'=>1,'VEHICLENUMBERING'=>$d0_car,'PLANTIME'=> date('h:i',strtotime($data[0]['time'])),'jhjg'=>$jhjg,'yjjg'=>$yjjg );
         //发车时间整理，封装成模拟图能正常读取的API
         
         
@@ -569,12 +609,32 @@ function departscreen($line_id,$roadline)
         if ($yjjg < 0) $yjjg = $jhjg;
         if (empty($data[0]['time'])) $data[0]['time'] = $data['time'];
         
-        //if (empty($d1_car)) $d1_car = 'SQL Error';
-
-        $data1 = array('dir'=>0,'VEHICLENUMBERING'=>$d1_car,'PLANTIME'=>$data[0]['time'],'jhjg'=>$jhjg,'yjjg'=>$yjjg );
+        if ((strtotime($data[0]['time']) + 600) < time())
+        {
+            if(!empty($data[1]['time']))
+            {
+                if (strtotime($data[1]['time']) > time()) 
+                {
+                    $data[0]['time'] = $data[1]['time'];
+                    foreach($arr as $t1 => $t2) if ($t2 == $data[1]['vehicle'] ) $d1_car = $t1;
+                    $jhjg = $yjjg;
+                }
+                elseif(!empty($data[2]['time']))
+                {
+                    if (strtotime($data[2]['time']) > time()) 
+                    {
+                        $data[0]['time'] = $data[2]['time'];
+                        foreach($arr as $t1 => $t2) if ($t2 == $data[2]['vehicle'] ) $d1_car = $t1;
+                        $jhjg = $yjjg;
+                    }
+                }
+            }
+        }
+        
+        $data1 = array('dir'=>0,'VEHICLENUMBERING'=>$d1_car,'PLANTIME'=> date('h:i',strtotime($data[0]['time'])),'jhjg'=>$jhjg,'yjjg'=>$yjjg );
         
         $data2['jhpc']=0;$data2['dqyy']=0;
-        $file = "pc/$roadline.json";
+        $file = "./pc/$roadline.json";
         if(file_exists($file)){
         $data2 = file_get_contents($file); //读取缓存
         $data2 = json_decode($data2,true);
